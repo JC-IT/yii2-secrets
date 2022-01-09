@@ -1,0 +1,49 @@
+{
+    "name": "jc-it/yii2-secrets",
+    "description": "Secrets storage and extractor",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joey Claessen",
+            "email": "joey_claessen@hotmail.com",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+
+        "jc-it/secrets": "dev-master",
+        "yiisoft/yii2": "~2.0.42"
+    },
+    "repositories": [],
+    "autoload": {
+        "psr-4": {
+            "JCIT\\secrets\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JCIT\\tests\\secrets\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "cghooks add --ignore-lock",
+        "test": "vendor/bin/codecept run --coverage",
+        "lint": "vendor/bin/phpcs",
+        "lint-fix": "vendor/bin/phpcbf"
+    },
+    "extra": {
+        "hooks": {
+            "pre-commit": [
+                "echo committing as $(git config user.name) &&",
+                "composer lint-fix  &&",
+                "composer lint &&",
+                "composer test"
+            ],
+            "commit-msg": [
+                "npx commitlint -e"
+            ]
+        }
+    }
+}
