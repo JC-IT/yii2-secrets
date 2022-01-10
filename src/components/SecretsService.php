@@ -10,7 +10,9 @@ use JCIT\secrets\interfaces\StorageInterface;
 class SecretsService implements SecretsInterface
 {
     public function __construct(
-        private StorageInterface $storage
+        private StorageInterface $storage,
+        private string $yiiExecutable = 'yii',
+        private string $extractAction = 'secrets/extract',
     ) {
     }
 
@@ -34,8 +36,11 @@ class SecretsService implements SecretsInterface
         return $result;
     }
 
-    private function isExtractCall(): bool
+    protected function isExtractCall(): bool
     {
-        return false;
+        return
+            isset($_SERVER['argv'], $_SERVER['argv'][0], $_SERVER['argv'][1])
+            && substr($_SERVER['argv'][0], -strlen($this->yiiExecutable)) === $this->yiiExecutable
+            && $_SERVER['argv'][1] === $this->extractAction;
     }
 }

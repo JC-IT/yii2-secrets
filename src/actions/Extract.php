@@ -12,7 +12,7 @@ use yii\helpers\FileHelper;
 
 class Extract extends Action
 {
-    public array $calls = ['$secrets->get', '$secrets->getAndThrow'];
+    public array $calls = ['$secrets->get', '$secrets->getAndThrowOnEmpty'];
     public array $except = [
         '.*',
         '/.*',
@@ -26,7 +26,7 @@ class Extract extends Action
 
     protected function extractSecrets($fileName, $calls)
     {
-        $this->stdout('Extracting messages from ');
+        $this->stdout('Extracting secrets from ');
         $this->stdout($fileName, Console::FG_CYAN);
         $this->stdout("...\n");
 
@@ -46,7 +46,7 @@ class Extract extends Action
 
     protected function extractSecretsFromTokens(string $file, array $tokens, array $callTokens): array
     {
-        $messages = [];
+        $secrets = [];
         $calllatorTokensCount = count($callTokens);
         $matchedTokensCount = 0;
         $buffer = [];
@@ -75,12 +75,12 @@ class Extract extends Action
                                 $default = stripcslashes(mb_substr($buffer[2][1], 1, -1));
                             }
 
-                            $messages[stripcslashes(mb_substr($buffer[0][1], 1, -1))][] = new SecretOccurrence($file, $this->getLine([0]), $default);
+                            $secrets[stripcslashes(mb_substr($buffer[0][1], 1, -1))][] = new SecretOccurrence($file, $this->getLine([0]), $default);
                         } else {
                             // invalid call or dynamic call we can't extract
                             $line = Console::ansiFormat($this->getLine($buffer), [Console::FG_CYAN]);
                             $skipping = Console::ansiFormat('Skipping line', [Console::FG_YELLOW]);
-                            $this->stdout("$skipping $line. Make sure both category and message are static strings.\n");
+                            $this->stdout("$skipping $line. Make sure all are static strings.\n");
                         }
 
                         // prepare for the next match
@@ -116,7 +116,7 @@ class Extract extends Action
             }
         }
 
-        return $messages;
+        return $secrets;
     }
 
     protected function getLine(array $tokens): int
@@ -158,7 +158,7 @@ class Extract extends Action
     {
         $args = func_get_args();
         array_shift($args);
-        return $this->controller->stdout($string, $args);
+        return $this->controller->stdout($string, ...$args);
     }
 
     protected function tokensEqual(array|string $a, array|string $b): bool
