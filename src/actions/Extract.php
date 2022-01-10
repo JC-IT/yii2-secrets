@@ -44,31 +44,31 @@ class Extract extends Action
         return $secrets;
     }
 
-    protected function extractSecretsFromTokens(string $file, array $tokens, array $translatorTokens): array
+    protected function extractSecretsFromTokens(string $file, array $tokens, array $callTokens): array
     {
         $messages = [];
-        $translatorTokensCount = count($translatorTokens);
+        $calllatorTokensCount = count($callTokens);
         $matchedTokensCount = 0;
         $buffer = [];
         $pendingParenthesisCount = 0;
 
         foreach ($tokens as $tokenIndex => $token) {
-            // finding out translator call
-            if ($matchedTokensCount < $translatorTokensCount) {
-                if ($this->tokensEqual($token, $translatorTokens[$matchedTokensCount])) {
+            // finding out secret call
+            if ($matchedTokensCount < $calllatorTokensCount) {
+                if ($this->tokensEqual($token, $callTokens[$matchedTokensCount])) {
                     $matchedTokensCount++;
                 } else {
                     $matchedTokensCount = 0;
                 }
-            } elseif ($matchedTokensCount === $translatorTokensCount) {
-                // translator found
+            } elseif ($matchedTokensCount === $calllatorTokensCount) {
+                // secret found
 
                 // end of function call
                 if ($this->tokensEqual(')', $token)) {
                     $pendingParenthesisCount--;
 
                     if ($pendingParenthesisCount === 0) {
-                        // end of translator call or end of something that we can't extract
+                        // end of secret call or end of something that we can't extract
                         if (isset($buffer[0][0]) && $buffer[0][0] === T_CONSTANT_ENCAPSED_STRING) {
                             $default = null;
                             if (isset($buffer[1], $buffer[2][0]) && $buffer[2][0] === T_CONSTANT_ENCAPSED_STRING) {
@@ -91,10 +91,9 @@ class Extract extends Action
                         $buffer[] = $token;
                     }
                 } elseif ($this->tokensEqual('(', $token)) {
-                    // count beginning of function call, skipping translator beginning
+                    // count beginning of function call, skipping secret call beginning
 
-                    // If we are not yet inside the translator, make sure that it's beginning of the real translator.
-                    // See https://github.com/yiisoft/yii2/issues/16828
+                    // If we are not yet inside the secret call, make sure that it's beginning of the real secret call.
                     if ($pendingParenthesisCount === 0) {
                         $previousTokenIndex = $tokenIndex - $matchedTokensCount - 1;
                         if (is_array($tokens[$previousTokenIndex])) {
