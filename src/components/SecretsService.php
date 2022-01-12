@@ -16,12 +16,12 @@ class SecretsService implements SecretsInterface
     ) {
     }
 
-    public function get(string $secret, string|int|null $default = null): string|int|null
+    public function get(string $secret, string|int|bool|null $default = null): string|int|null
     {
         return $this->storage->get($secret) ?? $default;
     }
 
-    public function getAndThrowOnEmpty(string $secret): string|int
+    public function getAndThrowOnNull(string $secret): string|int
     {
         $result = $this->get($secret);
 
@@ -30,7 +30,7 @@ class SecretsService implements SecretsInterface
                 return 'EXTRACT CALL';
             }
 
-            throw SecretsException::notFound($secret);
+            throw new SecretsException('Secret could not be found: ' . $secret);
         }
 
         return $result;
@@ -40,7 +40,7 @@ class SecretsService implements SecretsInterface
     {
         return
             isset($_SERVER['argv'], $_SERVER['argv'][0], $_SERVER['argv'][1])
-            && substr($_SERVER['argv'][0], -strlen($this->yiiExecutable)) === $this->yiiExecutable
+            && str_ends_with($_SERVER['argv'][0], $this->yiiExecutable)
             && $_SERVER['argv'][1] === $this->extractAction;
     }
 }
