@@ -1,0 +1,37 @@
+name: Continous integration
+on: [push, pull_request]
+jobs:
+  code_checks:
+    name: Check code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: symplify/easy-coding-standard, phpstan, phpunit
+      - name: Test code style
+        run: ecs
+      - name: Install dependencies
+        run: composer install --no-dev
+      - name: Static analysis
+        run: phpstan analyse src
+      - name: Install dependencies including dev
+        run: composer install
+      - name: Tests
+        run: phpunit --coverage-clover coverage.xml
+      - name: Static analysis of tests
+        run: phpstan analyse tests
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+  commitlint:
+    name: commit-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ahmadnassri/action-commit-lint@v1
+        with:
+          config: conventional
