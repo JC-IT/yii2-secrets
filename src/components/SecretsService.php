@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace JCIT\secrets\components;
@@ -9,6 +10,8 @@ use JCIT\secrets\interfaces\StorageInterface;
 
 class SecretsService implements SecretsInterface
 {
+    public const EXTRACT_CALL_VALUE = 'extractCallValue';
+
     public function __construct(
         private StorageInterface $storage,
         private string $yiiExecutable = 'yii',
@@ -16,18 +19,18 @@ class SecretsService implements SecretsInterface
     ) {
     }
 
-    public function get(string $secret, string|int|bool|null $default = null): string|int|null
+    public function get(string $secret, string|int|bool|null $default = null): string|int|bool|null
     {
         return $this->storage->get($secret) ?? $default;
     }
 
-    public function getAndThrowOnNull(string $secret): string|int
+    public function getAndThrowOnNull(string $secret): string|int|bool
     {
         $result = $this->get($secret);
 
         if (is_null($result)) {
             if ($this->isExtractCall()) {
-                return 'EXTRACT CALL';
+                return self::EXTRACT_CALL_VALUE;
             }
 
             throw new SecretsException('Secret could not be found: ' . $secret);

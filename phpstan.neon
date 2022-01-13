@@ -1,0 +1,12 @@
+parameters:
+  level: 9
+  paths:
+    - src
+    - tests
+  excludePaths:
+    - src/adapters
+  treatPhpDocTypesAsCertain: false
+  ignoreErrors:
+    - "#Casting to string something that's already string#"
+    - '#Test::data[a-zA-Z0-9_]+\(\) return type has no value type specified in iterable type#'
+  reportUnmatchedIgnoredErrors: false

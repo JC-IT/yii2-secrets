@@ -1,6 +1,6 @@
 {
     "name": "jc-it/yii2-secrets",
-    "description": "Secrets storage and extractor",
+    "description": "Secrets storage and extractor for Yii2",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -13,10 +13,27 @@
     "require": {
         "php": ">=8.0",
 
-        "jc-it/secrets": "dev-master",
+        "jc-it/secrets": "^1.0.0",
         "yiisoft/yii2": "~2.0.42"
     },
-    "repositories": [],
+    "require-dev": {
+        "captainhook/plugin-composer": "^5.3",
+        "mikey179/vfsstream": "^1.6",
+        "phpstan/phpstan": "^1.2",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpstan/phpstan-strict-rules": "^1.1",
+        "phpunit/phpunit": "^9.5",
+        "ramsey/conventional-commits": "^1.3",
+        "symfony/console": "^5.4.2",
+        "symplify/easy-coding-standard": "^10.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "JCIT\\secrets\\": "src/"
@@ -24,26 +41,19 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "JCIT\\tests\\secrets\\": "tests/"
+            "JCIT\\secrets\\tests\\": "tests/"
         }
     },
     "scripts": {
-        "post-install-cmd": "cghooks add --ignore-lock",
-        "test": "vendor/bin/codecept run --coverage",
-        "lint": "vendor/bin/phpcs",
-        "lint-fix": "vendor/bin/phpcbf"
+        "lint": "vendor/bin/ecs",
+        "lint-fix": "vendor/bin/ecs --fix",
+        "test": "vendor/bin/phpunit --coverage"
     },
-    "extra": {
-        "hooks": {
-            "pre-commit": [
-                "echo committing as $(git config user.name) &&",
-                "composer lint-fix  &&",
-                "composer lint &&",
-                "composer test"
-            ],
-            "commit-msg": [
-                "npx commitlint -e"
-            ]
+    "config": {
+        "allow-plugins": {
+            "captainhook/plugin-composer": true,
+            "phpstan/extension-installer": true,
+            "yiisoft/yii2-composer": true
         }
     }
 }

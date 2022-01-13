@@ -1,4 +1,6 @@
 .idea
-tests/_output
-vendor
+.phpdoc
+.phpunit.cache/
 composer.lock
+html/
+vendor/
